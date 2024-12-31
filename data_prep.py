@@ -126,7 +126,7 @@ def UVA_outlier(data, var_group, include_outlier = True):
             train[i][train[i]<whis_low] = whis_low-1
       
       # plotting without outliers
-            plt.subplot(1,size,j+1)
+            plt.subplot(1, size,j+1)
             sns.boxplot(train[i], orient="v")
             plt.ylabel('{}'.format(i))
             plt.title('Without Outliers\nIQR = {}; Median = {} \n 2nd,3rd  quartile = {};\n Outlier (low/high) = {} \n'.format(
