@@ -30,8 +30,8 @@ df = pd.concat([df,pd.get_dummies(df['Is_Active'],prefix = str('Is_Active'),pref
 df.drop(['Gender'], axis = 1, inplace = True)
 df.drop(['Occupation'], axis = 1, inplace = True)
 df.drop(['Channel_Code'], axis = 1, inplace = True)
-df.drop(['Credit_Product'], axis =1 , inplace = True)
-df.drop(['Is_Active'], axis =1 , inplace = True)
+df.drop(['Credit_Product'], axis = 1 , inplace = True)
+df.drop(['Is_Active'], axis = 1 , inplace = True)
 
 df.head()
 
@@ -42,51 +42,51 @@ cat_features = ['Gender_Female','Gender_Male','Occupation_Entrepreneur','Occupat
 
 
 def train_lgbm(df,seed,cat_features):
-    X = df[df['train']==1]
-    y = df[df['train']==1]['Is_Lead']
-    test_data = df[df['train']==0]
+    X = df[df['train'] == 1]
+    y = df[df['train'] == 1]['Is_Lead']
+    test_data = df[df['train'] == 0]
     num_split = 10
     folds = StratifiedKFold(n_splits=num_split)
     excluded_features = ['Is_Lead','train','ID']
     train_features = [_f for _f in X.columns if _f not in excluded_features]
     importances = pd.DataFrame()
-    oof_reg_preds = np.zeros(X.shape[0])
-    test_preds = np.zeros(test_data.shape[0])
-    for fold_, (trn_, val_) in enumerate(folds.split(X, y)):
+    oof_reg_preds = np.zeros( X.shape[0] )
+    test_preds = np.zeros( test_data.shape[0] )
+    for fold_, (trn_, val_) in enumerate( folds.split(X, y) ):
         print("Fold:",fold_)
         trn_x, trn_y = X[train_features].iloc[trn_], y.iloc[trn_]
         val_x, val_y = X[train_features].iloc[val_], y.iloc[val_]
         clf1 = LGBMClassifier(
-            n_jobs=-1,
-            learning_rate=0.0094,
-            n_estimators=10000,
-            colsample_bytree=0.94,
+            n_jobs = -1,
+            learning_rate = 0.0094,
+            n_estimators = 10000,
+            colsample_bytree = 0.94,
             subsample = 0.75,
             subsample_freq = 1,
             reg_alpha= 1.0,
             reg_lambda = 5.0,
-            random_state=seed
+            random_state = seed
         )
         clf1.fit(
             trn_x,trn_y ,
             eval_set=[(val_x, val_y)],
-            early_stopping_rounds=100,
-            verbose=False,
-            eval_metric='auc',
+            early_stopping_rounds = 100,
+            verbose = False,
+            eval_metric ='auc',
             categorical_feature = cat_features
         )
         
         # Extra boosting.
         clf = LGBMClassifier(
-            n_jobs=-1,
-            learning_rate=0.00094,
-            n_estimators=10000,
-            colsample_bytree=0.94,
+            n_jobs = -1,
+            learning_rate = 0.00094,
+            n_estimators = 10000,
+            colsample_bytree = 0.94,
             subsample = 0.75,
             subsample_freq = 1,
             reg_alpha= 1.0,
             reg_lambda = 5.0,
-            random_state=seed
+            random_state = seed
         )
         clf.fit(
             trn_x,trn_y ,
